@@ -1,0 +1,2 @@
+# Antigravity Daily Executive Briefing
+毎日のビジネス・テクノロジーニュースとAIエージェントによる戦略ディベートが記録された公開アーカイブです。
