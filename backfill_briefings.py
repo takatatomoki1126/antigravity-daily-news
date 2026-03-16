@@ -8,23 +8,24 @@ from scripts.generators.daily_briefing_generator import generate_daily_briefing
 from duckduckgo_search import DDGS
 
 def fetch_past_news(date_str, query, limit=3):
-    """DuckDuckGoを使用して特定の日付付近のニュースを検索"""
-    print(f"  - Searching for '{query}' for {date_str}...")
+    """DuckDuckGoを使用してニュースを検索"""
+    print(f"  - Searching for '{query}'...")
     extracted = []
     try:
         with DDGS() as ddgs:
-            # after:before: クエリは厳格すぎる場合があるため、
-            # 単純に「キーワード + 日付」で検索する
-            simple_query = f"{query} {date_str}"
-            results = list(ddgs.text(simple_query, max_results=limit))
+            # 最新のニュース検索 (ddgs.news) を使用
+            # 過去日はキーワードに含める
+            q = f"{query} {date_str}"
+            results = list(ddgs.news(q, max_results=limit))
+            
             if not results:
-                # バックアップ: 日付なしで検索
-                results = list(ddgs.text(query, max_results=limit))
+                print(f"    No results for '{q}', trying '{query}' generic...")
+                results = list(ddgs.news(query, max_results=limit))
             
             for r in results:
                 extracted.append({
                     "title": r.get('title', 'No Title'),
-                    "link": r.get('href', 'No Link'),
+                    "link": r.get('url', 'No Link'), # ddgs.news では 'url' キー
                     "summary": r.get('body', '')
                 })
             print(f"    Found {len(extracted)} items.")
