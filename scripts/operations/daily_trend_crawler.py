@@ -59,7 +59,7 @@ def run_all_crawlers():
 
     # 従来通りのTechTrend（HackerNews）
     print("Collecting Hacker News (Global Tech)...")
-    tech_news = fetch_rss_news("https://news.ycombinator.com/rss", limit=3)
+    tech_news = fetch_rss_news("https://news.ycombinator.com/rss", limit=5)
 
     # 日本のGoogle News トピック
     print("Collecting Japan News...")
@@ -73,7 +73,7 @@ def run_all_crawlers():
     # Google Antigravity / AI関連技術
     print("Collecting Google AI & Antigravity News...")
     ai_query = urllib.parse.quote("Google Antigravity OR Google AI")
-    ai_news = fetch_rss_news(f"https://news.google.com/rss/search?q={ai_query}&hl=ja&gl=JP&ceid=JP:ja", limit=3)
+    ai_news = fetch_rss_news(f"https://news.google.com/rss/search?q={ai_query}&hl=ja&gl=JP&ceid=JP:ja", limit=5)
 
     return {
         "exchange_rate": rate_info,

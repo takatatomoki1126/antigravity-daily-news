@@ -21,7 +21,7 @@ def analyze_trends(all_data):
     for category, news_list in all_data.items():
         if category == 'exchange_rate' or not news_list: continue
         prompt += f"■ 【{category.upper()}】\n"
-        for i, item in enumerate(news_list[:3], 1): # トークン節約のため各3件
+        for i, item in enumerate(news_list[:5], 1): # 各カテゴリー最大5件を参照
             prompt += f"  - {item['title']}\n"
         prompt += "\n"
 
