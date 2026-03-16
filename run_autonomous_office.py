@@ -38,13 +38,14 @@ def run_autonomous_office():
 
     print("🌍 [Step 4] Linus Torvalds (Version Control): ニュースレポートをGitHubへ公開しています...")
     try:
-        reports_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'reports')
+        base_dir = os.path.abspath(os.path.dirname(__file__))
         today_str = datetime.now().strftime('%Y-%m-%d')
-
+ 
         # Git コマンドを実行して自動コミットとプッシュ
-        subprocess.run(['git', 'add', '.'], cwd=reports_dir, check=True, capture_output=True)
-        subprocess.run(['git', 'commit', '-m', f'docs: Auto-publish daily briefing {today_str}'], cwd=reports_dir, check=False, capture_output=True)
-        subprocess.run(['git', 'push', 'origin', 'main'], cwd=reports_dir, check=True, capture_output=True)
+        # Git操作の基準ディレクトリをプロジェクトルート(base_dir)に変更
+        subprocess.run(['git', 'add', '.'], cwd=base_dir, check=True, capture_output=True)
+        subprocess.run(['git', 'commit', '-m', f'docs: Auto-publish daily briefing {today_str}'], cwd=base_dir, check=False, capture_output=True)
+        subprocess.run(['git', 'push', 'origin', 'main'], cwd=base_dir, check=True, capture_output=True)
 
         print("   -> GitHubへの自動デプロイ（公開）完了。")
     except Exception as e:
