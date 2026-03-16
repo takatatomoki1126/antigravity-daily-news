@@ -18,7 +18,7 @@ def generate_daily_briefing(analysis_text, all_data):
     content += f"**Date**: {date_str} | **To**: The Chairman (User)\n"
     content += f"**System**: Antigravity Intelligence System (v2.5 Premium)\n"
     content += f"**Status**: All systems operational. 30 Expert Agents on standby.\n\n"
-    content += f"---"
+    content += f"\n---\n\n"
 
     # 1. 経済・為替インジケーター
     content += f"## 📈 1. Economic Indicators\n"
