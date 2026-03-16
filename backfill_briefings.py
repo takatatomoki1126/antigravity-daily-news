@@ -9,21 +9,27 @@ from duckduckgo_search import DDGS
 
 def fetch_past_news(date_str, query, limit=3):
     """DuckDuckGoを使用して特定の日付付近のニュースを検索"""
-    print(f"  - Searching for '{query}' around {date_str}...")
+    print(f"  - Searching for '{query}' for {date_str}...")
     extracted = []
     try:
         with DDGS() as ddgs:
-            # 日付指定のクエリを作成
-            search_query = f"{query} after:{date_str} before:{date_str}"
-            results = list(ddgs.text(search_query, max_results=limit))
+            # after:before: クエリは厳格すぎる場合があるため、
+            # 単純に「キーワード + 日付」で検索する
+            simple_query = f"{query} {date_str}"
+            results = list(ddgs.text(simple_query, max_results=limit))
+            if not results:
+                # バックアップ: 日付なしで検索
+                results = list(ddgs.text(query, max_results=limit))
+            
             for r in results:
                 extracted.append({
                     "title": r.get('title', 'No Title'),
                     "link": r.get('href', 'No Link'),
                     "summary": r.get('body', '')
                 })
+            print(f"    Found {len(extracted)} items.")
     except Exception as e:
-        print(f"    Error searching news: {e}")
+        print(f"    Error searching news for {query}: {e}")
     return extracted
 
 def backfill(date_str):
