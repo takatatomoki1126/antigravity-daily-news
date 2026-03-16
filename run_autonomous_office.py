@@ -42,12 +42,12 @@ def run_autonomous_office():
         today_str = datetime.now().strftime('%Y-%m-%d')
  
         # Git コマンドを実行して自動コミットとプッシュ
-        # Git操作の基準ディレクトリをプロジェクトルート(base_dir)に変更
+        # プロジェクト全体（各レポートディレクトリ含む）を同期
         subprocess.run(['git', 'add', '.'], cwd=base_dir, check=True, capture_output=True)
-        subprocess.run(['git', 'commit', '-m', f'docs: Auto-publish daily briefing {today_str}'], cwd=base_dir, check=False, capture_output=True)
+        subprocess.run(['git', 'commit', '-m', f'docs: Update daily briefing and archive {today_str}'], cwd=base_dir, check=False, capture_output=True)
         subprocess.run(['git', 'push', 'origin', 'main'], cwd=base_dir, check=True, capture_output=True)
-
-        print("   -> GitHubへの自動デプロイ（公開）完了。")
+ 
+        print("   -> GitHubへの自動デプロイ（公開・アーカイブ）完了。")
     except Exception as e:
         print(f"   -> [エラー] GitHubへの公開に失敗しました: {e}")
 
