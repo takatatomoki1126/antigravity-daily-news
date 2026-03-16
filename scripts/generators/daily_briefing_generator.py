@@ -48,8 +48,6 @@ def generate_daily_briefing(analysis_text, all_data):
     content += format_news_section("Taiwan & China Relations", "🇹🇼", all_data.get('taiwan_news', []))
     content += format_news_section("Global Tech Trends", "💻", all_data.get('tech_news', []))
 
-    content += f"---\n\n"
-
     # 3. マルチエージェント分析
     content += f"## 🧑‍💻 3. Multi-Agent Strategic Analysis\n"
     content += f"我々Antigravityの専門家陣によるディベート結果・アクションプラン体系化：\n\n"
