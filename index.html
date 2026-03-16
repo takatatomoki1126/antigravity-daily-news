@@ -1,14 +1,560 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/antigravity-daily-news/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dashboard</title>
-    <script type="module" crossorigin src="/antigravity-daily-news/assets/index-2hniJshx.js"></script>
-    <link rel="stylesheet" crossorigin href="/antigravity-daily-news/assets/index-B_zJZk3x.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Antigravity Daily Executive Briefing</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>" />
+  <!-- marked.js for markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:          #0d1117;
+      --bg-panel:    #161b22;
+      --bg-card:     #1c2128;
+      --bg-hover:    #21262d;
+      --border:      #30363d;
+      --border-subtle: #21262d;
+      --text:        #e6edf3;
+      --text-muted:  #7d8590;
+      --text-subtle: #484f58;
+      --accent:      #58a6ff;
+      --accent-glow: rgba(88, 166, 255, 0.15);
+      --green:       #3fb950;
+      --yellow:      #d29922;
+      --red:         #f85149;
+      --purple:      #bc8cff;
+      --orange:      #ffa657;
+      --cyan:        #39c5cf;
+      --sidebar-w:   280px;
+    }
+    html { font-size: 15px; }
+    body {
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-subtle); }
+
+    /* ===== SIDEBAR ===== */
+    #sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      z-index: 10;
+    }
+    .sidebar-header {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .logo-icon {
+      font-size: 24px;
+      line-height: 1;
+    }
+    .logo-text {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .logo-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+      font-weight: 400;
+    }
+    .sidebar-section-label {
+      padding: 16px 20px 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-subtle);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .date-list {
+      list-style: none;
+      padding: 0 10px 20px;
+    }
+    .date-list li {
+      margin: 1px 0;
+    }
+    .date-btn {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 7px 10px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 400;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.1s, color 0.1s;
+      gap: 8px;
+    }
+    .date-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text);
+    }
+    .date-btn.active {
+      background: var(--accent-glow);
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .date-btn .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+    .date-btn.active .dot { background: var(--accent); }
+    .date-label { flex: 1; }
+    .date-weekday {
+      font-size: 11px;
+      color: var(--text-subtle);
+    }
+    .date-btn.active .date-weekday { color: rgba(88,166,255,0.6); }
+
+    /* ===== MAIN ===== */
+    #main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .main-header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: rgba(13, 17, 23, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-date {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .header-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .header-badge.live {
+      border-color: rgba(63, 185, 80, 0.4);
+      color: var(--green);
+      background: rgba(63, 185, 80, 0.08);
+    }
+    .nav-btns { margin-left: auto; display: flex; gap: 6px; }
+    .nav-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 13px;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.1s;
+    }
+    .nav-btn:hover:not(:disabled) { background: var(--bg-hover); color: var(--text); }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* ===== CONTENT ===== */
+    #content-area {
+      flex: 1;
+      padding: 40px 48px;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Loading state */
+    #loading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-muted);
+      font-size: 14px;
+      padding: 60px 0;
+    }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error state */
+    #error-msg {
+      display: none;
+      padding: 20px;
+      background: rgba(248, 81, 73, 0.08);
+      border: 1px solid rgba(248, 81, 73, 0.3);
+      border-radius: 8px;
+      color: var(--red);
+      font-size: 14px;
+    }
+
+    /* ===== MARKDOWN STYLES ===== */
+    .md-body { animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    .md-body h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+      line-height: 1.3;
+    }
+    .md-body h2 {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 40px;
+      margin-bottom: 16px;
+      padding: 10px 14px;
+      background: var(--bg-card);
+      border-radius: 8px;
+      border-left: 3px solid var(--accent);
+      letter-spacing: -0.01em;
+    }
+    .md-body h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-top: 24px;
+      margin-bottom: 8px;
+    }
+    .md-body h3 a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .md-body h3 a:hover { text-decoration: underline; }
+
+    .md-body p {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    /* Blockquote = news card */
+    .md-body blockquote {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin: 0 0 4px 0;
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .md-body blockquote p { margin: 0; font-size: inherit; color: inherit; }
+    .md-body blockquote strong { color: var(--text); font-weight: 600; }
+
+    /* 【詳細概要】の見出し */
+    .md-body blockquote p:has(strong) { margin-top: 8px; }
+
+    .md-body hr {
+      border: none;
+      border-top: 1px solid var(--border-subtle);
+      margin: 32px 0;
+    }
+
+    .md-body strong { color: var(--text); font-weight: 600; }
+    .md-body em { color: var(--orange); font-style: italic; }
+    .md-body code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      background: var(--bg-hover);
+      border: 1px solid var(--border);
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: var(--cyan);
+    }
+    .md-body pre {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+    .md-body pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 13px;
+    }
+    .md-body ul, .md-body ol {
+      padding-left: 20px;
+      margin: 8px 0 12px;
+    }
+    .md-body li {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      line-height: 1.65;
+    }
+    .md-body a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .md-body a:hover { text-decoration: underline; }
+
+    /* Exchange rate highlight */
+    .md-body blockquote:first-of-type {
+      border-left-color: var(--yellow);
+      background: rgba(210, 153, 34, 0.05);
+    }
+
+    /* ===== MOBILE ===== */
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      #sidebar {
+        width: 100%; min-width: 0;
+        height: auto; position: relative;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .date-list {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding: 8px 10px;
+        gap: 4px;
+      }
+      .date-list li { flex-shrink: 0; }
+      .date-weekday { display: none; }
+      #content-area { padding: 24px 20px; }
+      .main-header { padding: 10px 20px; }
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      text-align: center;
+      padding: 80px 0;
+      color: var(--text-subtle);
+    }
+    .empty-state .icon { font-size: 40px; margin-bottom: 16px; }
+    .empty-state p { font-size: 14px; }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <span class="logo-icon">🚀</span>
+      <div>
+        <div class="logo-text">Antigravity</div>
+        <div class="logo-sub">Daily Executive Briefing</div>
+      </div>
+    </div>
+  </div>
+  <div class="sidebar-section-label">Archives</div>
+  <ul class="date-list" id="date-list">
+    <!-- populated by JS -->
+  </ul>
+</aside>
+
+<!-- MAIN -->
+<main id="main">
+  <header class="main-header">
+    <span class="header-date" id="header-date">—</span>
+    <span class="header-badge live" id="header-badge">LIVE</span>
+    <div class="nav-btns">
+      <button class="nav-btn" id="btn-prev">← 前日</button>
+      <button class="nav-btn" id="btn-next">翌日 →</button>
+    </div>
+  </header>
+  <div id="content-area">
+    <div id="loading"><div class="spinner"></div><span>Loading...</span></div>
+    <div id="error-msg"></div>
+    <div id="md-output" class="md-body" style="display:none"></div>
+  </div>
+</main>
+
+<script>
+  // ===== CONFIG =====
+  const BASE = '/antigravity-daily-news';
+  const BRIEFINGS_DIR = `${BASE}/daily_briefings`;
+
+  // Detect all available dates from sidebar or hardcode (GitHub Pages can't list dirs)
+  // We'll generate a list by trying known dates and using a manifest approach.
+  // Since GitHub Pages is static, we embed the list of available files directly.
+  const AVAILABLE_DATES = [
+    "2026-02-26","2026-02-27","2026-02-28",
+    "2026-03-01","2026-03-02","2026-03-03","2026-03-04","2026-03-05","2026-03-06",
+    "2026-03-07","2026-03-08","2026-03-09","2026-03-10","2026-03-11","2026-03-12",
+    "2026-03-13","2026-03-14","2026-03-15","2026-03-16"
+  ].reverse(); // newest first
+
+  const WEEKDAYS = ['日','月','火','水','木','金','土'];
+
+  let currentIndex = 0; // index in AVAILABLE_DATES
+
+  function formatDateLabel(dateStr) {
+    const [y, m, d] = dateStr.split('-');
+    return `${m}/${d}`;
+  }
+  function getWeekday(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    return WEEKDAYS[d.getDay()];
+  }
+  function isToday(dateStr) {
+    const now = new Date();
+    const today = now.toISOString().slice(0,10);
+    return dateStr === today;
+  }
+
+  // Build sidebar
+  function buildSidebar() {
+    const list = document.getElementById('date-list');
+    list.innerHTML = '';
+    AVAILABLE_DATES.forEach((date, i) => {
+      const li = document.createElement('li');
+      const btn = document.createElement('button');
+      btn.className = 'date-btn' + (i === 0 ? ' active' : '');
+      btn.dataset.index = i;
+      btn.innerHTML = `
+        <span class="dot"></span>
+        <span class="date-label">${formatDateLabel(date)}</span>
+        <span class="date-weekday">${getWeekday(date)}</span>
+      `;
+      btn.addEventListener('click', () => loadDate(i));
+      li.appendChild(btn);
+      list.appendChild(li);
+    });
+  }
+
+  function setActiveSidebar(idx) {
+    document.querySelectorAll('.date-btn').forEach((b, i) => {
+      b.classList.toggle('active', i === idx);
+    });
+  }
+
+  // Load and render a briefing
+  async function loadDate(idx) {
+    currentIndex = idx;
+    const dateStr = AVAILABLE_DATES[idx];
+
+    setActiveSidebar(idx);
+
+    // Update header
+    const [y, m, d] = dateStr.split('-');
+    document.getElementById('header-date').textContent = `${y}年${m}月${d}日 (${getWeekday(dateStr)})`;
+    const badge = document.getElementById('header-badge');
+    if (isToday(dateStr)) {
+      badge.textContent = 'TODAY';
+      badge.className = 'header-badge live';
+    } else {
+      badge.textContent = 'ARCHIVE';
+      badge.className = 'header-badge';
+    }
+
+    // Nav button states
+    document.getElementById('btn-prev').disabled = idx >= AVAILABLE_DATES.length - 1;
+    document.getElementById('btn-next').disabled = idx <= 0;
+
+    // Show loading
+    document.getElementById('loading').style.display = 'flex';
+    document.getElementById('md-output').style.display = 'none';
+    document.getElementById('error-msg').style.display = 'none';
+
+    try {
+      const url = `${BRIEFINGS_DIR}/Briefing_${dateStr}.md`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+
+      const html = marked.parse(text);
+      const output = document.getElementById('md-output');
+      output.innerHTML = html;
+
+      // Open all links in new tab
+      output.querySelectorAll('a').forEach(a => {
+        if (a.href && !a.href.startsWith('#')) a.target = '_blank';
+      });
+
+      document.getElementById('loading').style.display = 'none';
+      output.style.display = 'block';
+    } catch (e) {
+      document.getElementById('loading').style.display = 'none';
+      const err = document.getElementById('error-msg');
+      err.textContent = `ブリーフィングの読み込みに失敗しました: ${e.message}`;
+      err.style.display = 'block';
+    }
+
+    // Scroll to top
+    document.getElementById('content-area').scrollIntoView({ behavior: 'instant' });
+    window.scrollTo(0, 0);
+  }
+
+  // Nav buttons
+  document.getElementById('btn-prev').addEventListener('click', () => {
+    if (currentIndex < AVAILABLE_DATES.length - 1) loadDate(currentIndex + 1);
+  });
+  document.getElementById('btn-next').addEventListener('click', () => {
+    if (currentIndex > 0) loadDate(currentIndex - 1);
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft' && currentIndex < AVAILABLE_DATES.length - 1) loadDate(currentIndex + 1);
+    if (e.key === 'ArrowRight' && currentIndex > 0) loadDate(currentIndex - 1);
+  });
+
+  // Init
+  buildSidebar();
+  loadDate(0);
+</script>
+</body>
 </html>
